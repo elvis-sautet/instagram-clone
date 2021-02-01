@@ -1,0 +1,103 @@
+.post {
+  max-width: 500px;
+  margin: 0 auto;
+  border: 1px solid lightgray;
+  margin-bottom: 45px;
+}
+
+.post__image {
+  width: 100%;
+  object-fit: contain;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+}
+.post__text {
+  font-size: 15px;
+  font-weight: normal;
+  color: #000000;
+}
+.post__text strong {
+  color: #262626;
+}
+.post__header {
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.post__avatar {
+  margin-right: 6px;
+}
+.post__header h4 {
+  flex: 1;
+  color: #262626;
+  font-size: 18px;
+}
+
+.lines {
+  cursor: pointer;
+}
+svg {
+  fill: rgb(38, 38, 38);
+  height: 16;
+  width: 16;
+}
+.post__svg {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px;
+}
+
+svg {
+  cursor: pointer;
+}
+
+.post__feeds {
+  display: flex;
+  align-items: center;
+}
+.post__feeds svg {
+  margin: 8px;
+}
+.postText__commented {
+  border-bottom: 1px solid lightgray;
+}
+.post__text {
+  margin: 8px;
+}
+.comment__post {
+  outline: none;
+  border: none;
+}
+.post__commenting {
+  margin: 8px;
+}
+.commenting {
+  display: flex;
+  align-items: center;
+}
+.commenting textarea {
+  flex: 1;
+  outline: none;
+  padding: -5px;
+  border: none;
+  cursor: text;
+  background-color: transparent;
+  display: flex;
+  justify-items: center;
+  transform: translate3d(0, 6px, 0);
+  resize: inherit;
+}
+.commenting svg {
+  margin: 2px;
+  margin-right: 12px;
+}
+.commenting button {
+  background-color: transparent;
+  border: none;
+  margin: 3px;
+  color: #0095f6;
+  font-weight: bold;
+  margin-left: 12px;
+}
