@@ -11,7 +11,6 @@ function generateRandomColor() {
 
 function Post({ username, imgUrl, postComment }) {
   const [comment, setComment] = useState("");
-  console.log(comment);
   return (
     <div className="post">
       {/* header */}
@@ -99,7 +98,7 @@ function Post({ username, imgUrl, postComment }) {
         <form className="commenting">
           <svg
             aria-label="Emoji"
-            class="_8-yf5 "
+            className="_8-yf5 "
             fill="#262626"
             height="24"
             viewBox="0 0 48 48"
