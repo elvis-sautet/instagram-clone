@@ -1,10 +1,13 @@
-import { Avatar, Modal, Button, Input } from "@material-ui/core";
+import { Avatar, Modal, Button, Input, IconButton } from "@material-ui/core";
 import { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { db, auth } from "./Firebase";
 import "./App.css";
 import Post from "./components/Post";
 import { makeStyles } from "@material-ui/core/styles";
+import ImageUpload from "./components/ImageUpload";
+import moment from "moment";
+import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 
 function getModalStyle() {
   const top = 50;
@@ -27,6 +30,19 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
   },
+  IconButton: {
+    color: "black",
+  },
+  AddAPhotoIcon: {
+    fontSize: "40px",
+    color: "black",
+  },
+  IconButton: {
+    background: "linear-gradient(to right, #4facfe 0%, #00f2fe 100%)",
+  },
+  upload: {
+    color: "linear-gradient(to right, #4facfe 0%, #00f2fe 100%)",
+  },
 }));
 
 function App({ username, imgUrl, postComment }) {
@@ -40,6 +56,7 @@ function App({ username, imgUrl, postComment }) {
   const [usrname, setUsrname] = useState("");
   const [user, setUser] = useState(null);
   const [err, setError] = useState(null);
+  const [showImageUpload, setImageUpload] = useState(false);
 
   useEffect(() => {
     const unSubscribe = auth.onAuthStateChanged((authUser) => {
@@ -61,10 +78,12 @@ function App({ username, imgUrl, postComment }) {
   // fetching the posts from the database
   useEffect(() => {
     //  runs a piece of code based on a specific condition
-    db.collection("posts").onSnapshot((snapshot) => {
-      // everytime when the posts changes or gets updated;
-      setPost(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })));
-    });
+    db.collection("posts")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        // everytime when the posts changes or gets updated;
+        setPost(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })));
+      });
   }, []);
 
   // sign up
@@ -90,7 +109,11 @@ function App({ username, imgUrl, postComment }) {
     auth
       .signInWithEmailAndPassword(email, password)
       .catch((error) => setError(error.message));
-    setOpenSignIn(false);
+  };
+
+  const toggleImageUpload = () => {
+    const ImageUploadDiv = document.querySelector(".ImageUpload");
+    ImageUploadDiv.classList.toggle("toogle");
   };
   return (
     <div className="app ">
@@ -181,15 +204,42 @@ function App({ username, imgUrl, postComment }) {
           alt=""
           className="app__headerImage"
         />
+        {user ? (
+          <div>
+            <Button
+              onClick={() => auth.signOut()}
+              color="secondary"
+              variant="contained"
+              style={{ zIndex: 1000 }}
+            >
+              Log Out
+            </Button>
+            <div className="add__pic">
+              <IconButton
+                className={classes.IconButton}
+                aria-label="upload picture"
+                component="span"
+              >
+                <AddAPhotoIcon
+                  onClick={toggleImageUpload}
+                  variant="outlined"
+                  className={classes.AddAPhotoIcon}
+                />
+              </IconButton>
+            </div>
+
+            <ImageUpload username={user.displayName} />
+          </div>
+        ) : (
+          <div>
+            <div className="app__loginContainer">
+              <Button onClick={() => setOpen(true)}>sign up</Button>
+              <Button onClick={() => setOpenSignIn(true)}>sign in</Button>
+            </div>
+          </div>
+        )}
       </div>
-      {user ? (
-        <Button onClick={() => auth.signOut()}>Log Out</Button>
-      ) : (
-        <div className="app__loginContainer">
-          <Button onClick={() => setOpen(true)}>sign up</Button>
-          <Button onClick={() => setOpenSignIn(true)}>sign in</Button>
-        </div>
-      )}
+
       {/* post */}
       {posts.map(({ post, id }) => (
         <Post
@@ -197,6 +247,7 @@ function App({ username, imgUrl, postComment }) {
           username={post.username}
           imgUrl={post.imgUrl}
           postComment={post.postComment}
+          timestamp={post.timestamp}
         />
       ))}
     </div>

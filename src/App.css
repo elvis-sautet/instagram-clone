@@ -12,7 +12,15 @@
   padding: 20px;
   background-color: white;
   border-bottom: 1px solid lightgray;
-  margin-bottom: 45px;
+  z-index: 1000;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+}
+.app__header img {
+  object-fit: contain;
 }
 .app__signUp {
   display: flex;

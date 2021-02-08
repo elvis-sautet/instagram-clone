@@ -2,6 +2,8 @@ import { Avatar, TextField, makeStyles } from "@material-ui/core";
 import React, { useState, useRef } from "react";
 import { Container } from "react-bootstrap";
 import "./Post.css";
+import moment from "moment";
+import firebase from "firebase";
 
 function generateRandomColor() {
   var randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
@@ -9,8 +11,9 @@ function generateRandomColor() {
   //random color will be freshly served
 }
 
-function Post({ username, imgUrl, postComment }) {
+function Post({ username, imgUrl, postComment, timestamp }) {
   const [comment, setComment] = useState("");
+
   return (
     <div className="post">
       {/* header */}
@@ -90,6 +93,7 @@ function Post({ username, imgUrl, postComment }) {
         <h5 className="post__text">
           <strong>{username}</strong> {postComment}{" "}
         </h5>
+        {/* <small>{timeposted}</small> */}
       </div>
 
       {/* username + caption */}
