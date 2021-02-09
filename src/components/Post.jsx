@@ -1,26 +1,56 @@
 import { Avatar, TextField, makeStyles } from "@material-ui/core";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import "./Post.css";
 import moment from "moment";
+import { db, storage } from "../Firebase";
 import firebase from "firebase";
 
-function generateRandomColor() {
-  var randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-  return randomColor;
-  //random color will be freshly served
-}
+const useStyles = makeStyles({
+  Avatar: {
+    backgroundColor: "red",
+  },
+});
 
-function Post({ username, imgUrl, postComment, timestamp }) {
+function Post({ postId, username, user, imgUrl, postComment, timestamp }) {
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
+  const classes = useStyles();
+  let unsubscribe;
+  useEffect(() => {
+    if (postId) {
+      unsubscribe = db
+        .collection("posts")
+        .doc(postId)
+        .collection("comments")
+        .orderBy("timestamp", "desc")
+        .onSnapshot((snapshot) => {
+          setComments(snapshot.docs.map((doc) => doc.data()));
+        });
+    }
 
+    return () => {
+      unsubscribe();
+    };
+  }, [postId]);
+
+  const commentPost = (e) => {
+    e.preventDefault();
+
+    db.collection("posts").doc(postId).collection("comments").add({
+      text: comment,
+      username: user.displayName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    setComment("");
+  };
   return (
     <div className="post">
       {/* header */}
       <div className="post__header">
         <Avatar
+          className={classes.Avatar}
           className="post__avatar"
-          style={{ backgroundColor: generateRandomColor() }}
           alt={username}
           src="/static/images/avatar/1.jpg"
         />
@@ -93,36 +123,44 @@ function Post({ username, imgUrl, postComment, timestamp }) {
         <h5 className="post__text">
           <strong>{username}</strong> {postComment}{" "}
         </h5>
+        {comments.map((comment, id) => (
+          <h5 className="post__text" key={id}>
+            <strong>{comment.username}</strong> {comment.text}{" "}
+          </h5>
+        ))}
         {/* <small>{timeposted}</small> */}
       </div>
 
-      {/* username + caption */}
-
-      <div className="post__commenting">
-        <form className="commenting">
-          <svg
-            aria-label="Emoji"
-            className="_8-yf5 "
-            fill="#262626"
-            height="24"
-            viewBox="0 0 48 48"
-            width="24"
-          >
-            <path d="M24 48C10.8 48 0 37.2 0 24S10.8 0 24 0s24 10.8 24 24-10.8 24-24 24zm0-45C12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21S35.6 3 24 3z"></path>
-            <path d="M34.9 24c0-1.4-1.1-2.5-2.5-2.5s-2.5 1.1-2.5 2.5 1.1 2.5 2.5 2.5 2.5-1.1 2.5-2.5zm-21.8 0c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5-2.5-1.1-2.5-2.5zM24 37.3c-5.2 0-8-3.5-8.2-3.7-.5-.6-.4-1.6.2-2.1.6-.5 1.6-.4 2.1.2.1.1 2.1 2.5 5.8 2.5 3.7 0 5.8-2.5 5.8-2.5.5-.6 1.5-.7 2.1-.2.6.5.7 1.5.2 2.1 0 .2-2.8 3.7-8 3.7z"></path>
-          </svg>
-          <textarea
-            autoCorrect="off"
-            autoComplete="off"
-            style={{ height: "38px" }}
-            type="text"
-            value={comment}
-            placeholder="Add a comment..."
-            onChange={(e) => setComment(e.currentTarget.value)}
-          />
-          <button>Post</button>
-        </form>
-      </div>
+      {user && (
+        <div className="post__commenting">
+          <form className="commenting">
+            <svg
+              aria-label="Emoji"
+              className="_8-yf5 "
+              fill="#262626"
+              height="24"
+              viewBox="0 0 48 48"
+              width="24"
+            >
+              <path d="M24 48C10.8 48 0 37.2 0 24S10.8 0 24 0s24 10.8 24 24-10.8 24-24 24zm0-45C12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21S35.6 3 24 3z"></path>
+              <path d="M34.9 24c0-1.4-1.1-2.5-2.5-2.5s-2.5 1.1-2.5 2.5 1.1 2.5 2.5 2.5 2.5-1.1 2.5-2.5zm-21.8 0c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5-2.5-1.1-2.5-2.5zM24 37.3c-5.2 0-8-3.5-8.2-3.7-.5-.6-.4-1.6.2-2.1.6-.5 1.6-.4 2.1.2.1.1 2.1 2.5 5.8 2.5 3.7 0 5.8-2.5 5.8-2.5.5-.6 1.5-.7 2.1-.2.6.5.7 1.5.2 2.1 0 .2-2.8 3.7-8 3.7z"></path>
+            </svg>
+            <textarea
+              autoCorrect="off"
+              autoComplete="off"
+              style={{ height: "38px" }}
+              type="text"
+              value={comment}
+              placeholder="Add a comment..."
+              required
+              onChange={(e) => setComment(e.currentTarget.value)}
+            />
+            <button disabled={!comment} onClick={commentPost}>
+              Post
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

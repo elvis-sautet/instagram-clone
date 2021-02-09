@@ -6,7 +6,6 @@ import "./App.css";
 import Post from "./components/Post";
 import { makeStyles } from "@material-ui/core/styles";
 import ImageUpload from "./components/ImageUpload";
-import moment from "moment";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 
 function getModalStyle() {
@@ -98,17 +97,21 @@ function App({ username, imgUrl, postComment }) {
           displayName: usrname,
         });
       })
-      .catch((error) => setError(error.message));
-
+      .catch((error) => {
+        setError(error.message);
+        setOpen(true);
+      });
     setOpen(false);
   };
 
   const signin = (e) => {
     e.preventDefault();
 
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .catch((error) => setError(error.message));
+    auth.signInWithEmailAndPassword(email, password).catch((error) => {
+      setError(error.message);
+      setOpenSignIn(true);
+    });
+    setOpenSignIn(false);
   };
 
   const toggleImageUpload = () => {
@@ -239,17 +242,20 @@ function App({ username, imgUrl, postComment }) {
           </div>
         )}
       </div>
-
-      {/* post */}
-      {posts.map(({ post, id }) => (
-        <Post
-          key={id}
-          username={post.username}
-          imgUrl={post.imgUrl}
-          postComment={post.postComment}
-          timestamp={post.timestamp}
-        />
-      ))}
+      <div className="app__posts">
+        {/* post */}
+        {posts.map(({ post, id }) => (
+          <Post
+            user={user}
+            key={id}
+            postId={id}
+            username={post.username}
+            imgUrl={post.imgUrl}
+            postComment={post.postComment}
+            timestamp={post.timestamp}
+          />
+        ))}
+      </div>
     </div>
   );
 }

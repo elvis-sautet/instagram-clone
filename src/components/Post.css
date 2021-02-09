@@ -65,6 +65,10 @@ svg {
 .postText__commented {
   border-bottom: 1px solid lightgray;
 }
+/* }
+.postText__comment {
+  border-bottom: none;
+} */
 .post__text {
   margin: 8px;
 }
